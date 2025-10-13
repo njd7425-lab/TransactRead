@@ -20,6 +20,8 @@ const Dashboard = () => {
     fetchWallets();
   }, []);
 
+  const { addWallet } = useWallet();
+
   const handleAddWallet = async (e) => {
     e.preventDefault();
     if (!walletAddress.trim()) return;
