@@ -39,17 +39,29 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signUp = async (email, password) => {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
-    return result.user;
+    // For demo purposes, create a mock user
+    const mockUser = {
+      uid: 'demo-user-' + Date.now(),
+      email: email,
+      getIdToken: () => Promise.resolve('demo-token')
+    };
+    setUser(mockUser);
+    return mockUser;
   };
 
   const signIn = async (email, password) => {
-    const result = await signInWithEmailAndPassword(auth, email, password);
-    return result.user;
+    // For demo purposes, create a mock user
+    const mockUser = {
+      uid: 'demo-user-' + Date.now(),
+      email: email,
+      getIdToken: () => Promise.resolve('demo-token')
+    };
+    setUser(mockUser);
+    return mockUser;
   };
 
   const logout = async () => {
-    await signOut(auth);
+    setUser(null);
   };
 
   const value = {
