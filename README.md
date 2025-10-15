@@ -18,11 +18,11 @@ Blockchain transaction data is complex and difficult to interpret. Users need a 
 
 ## Tech Stack
 
-**Frontend**: React + Vite, TailwindCSS, Context API
-**Backend**: Node.js + Express, Prisma ORM, SQLite
-**AI**: Google Gemini 2.0 Flash for transaction summaries
-**Auth**: Firebase Admin SDK + MetaMask 
-**APIs**: Etherscan API for blockchain data
+**Frontend**: React + Vite, TailwindCSS, Context API  
+**Backend**: Node.js + Express, Prisma ORM, SQLite  
+**AI**: Google Gemini 2.0 Flash for transaction summaries  
+**Auth**: Firebase Admin SDK + MetaMask  
+**APIs**: Etherscan API for blockchain data  
 
 ## Quick Start
 
