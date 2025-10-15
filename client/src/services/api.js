@@ -68,5 +68,11 @@ export const api = {
   async signIn(email, uid) {
     const response = await apiClient.post('/auth/login', { email, uid });
     return response.data;
+  },
+
+  // Generic post method for MetaMask authentication
+  async post(url, data) {
+    const response = await apiClient.post(url, data);
+    return response;
   }
 };

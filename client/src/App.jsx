@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { MetaMaskProvider } from './contexts/MetaMaskContext';
 import { WalletProvider } from './contexts/WalletContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import ToastContainer from './components/ToastContainer';
@@ -13,31 +14,33 @@ function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <WalletProvider>
-          <Router>
-            <div className="min-h-screen bg-gray-50">
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/" element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="/wallet/:id" element={
-                  <ProtectedRoute>
-                    <WalletDetail />
-                  </ProtectedRoute>
-                } />
-                <Route path="/transaction/:id" element={
-                  <ProtectedRoute>
-                    <TransactionDetail />
-                  </ProtectedRoute>
-                } />
-              </Routes>
-              <ToastContainer />
-            </div>
-          </Router>
-        </WalletProvider>
+        <MetaMaskProvider>
+          <WalletProvider>
+            <Router>
+              <div className="min-h-screen bg-gray-50">
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/" element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/wallet/:id" element={
+                    <ProtectedRoute>
+                      <WalletDetail />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/transaction/:id" element={
+                    <ProtectedRoute>
+                      <TransactionDetail />
+                    </ProtectedRoute>
+                  } />
+                </Routes>
+                <ToastContainer />
+              </div>
+            </Router>
+          </WalletProvider>
+        </MetaMaskProvider>
       </AuthProvider>
     </ErrorBoundary>
   );

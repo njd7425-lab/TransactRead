@@ -41,6 +41,25 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     console.log('AuthContext useEffect - isFirebaseConfigured:', isFirebaseConfigured);
+    
+    // Check for MetaMask authentication first
+    const authToken = localStorage.getItem('authToken');
+    const userData = localStorage.getItem('user');
+    
+    if (authToken && userData) {
+      console.log('Found MetaMask authentication token');
+      try {
+        const user = JSON.parse(userData);
+        setUser(user);
+        setLoading(false);
+        return;
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+      }
+    }
+    
     if (!isFirebaseConfigured) {
       console.log('Firebase not configured, using demo mode');
       setUser({ uid: 'yk6q5OOywZRSmt4SOvOjdTpCftZ2', email: 'test1@gmail.com' });
@@ -100,6 +119,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    // Clear MetaMask authentication tokens
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    
     if (!isFirebaseConfigured) {
       console.log('Demo mode: logout called');
       setUser(null);

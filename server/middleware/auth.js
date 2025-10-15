@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const jwt = require('jsonwebtoken');
 
 // Initialize Firebase Admin SDK only if credentials are available
 if (!admin.apps.length && process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_PRIVATE_KEY !== 'demo_private_key') {
@@ -29,9 +30,35 @@ const authenticateToken = async (req, res, next) => {
   }
 
   try {
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    req.user = decodedToken;
-    next();
+    // First try Firebase token verification
+    try {
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      req.user = decodedToken;
+      return next();
+    } catch (firebaseError) {
+      console.log('Firebase token verification failed, trying JWT...');
+      
+      // If Firebase fails, try JWT verification (for MetaMask users)
+      try {
+        const decodedJwt = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Check if this is a MetaMask authentication
+        if (decodedJwt.authMethod === 'metamask') {
+          req.user = {
+            uid: decodedJwt.uid,
+            email: decodedJwt.email,
+            authMethod: 'metamask'
+          };
+          return next();
+        }
+        
+        // If it's not MetaMask auth, fall through to error
+        throw new Error('Invalid authentication method');
+      } catch (jwtError) {
+        console.error('JWT verification failed:', jwtError.message);
+        throw new Error('Invalid token');
+      }
+    }
   } catch (error) {
     console.error('Token verification failed:', error.message);
     return res.status(403).json({ error: 'Invalid token' });
