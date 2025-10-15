@@ -26,12 +26,44 @@ Blockchain transaction data is complex and difficult to interpret. Users need a 
 
 ## Quick Start
 
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-- MetaMask browser extension (for wallet auth)
+### Option 1: Docker (Recommended)
 
-### Installation
+**Prerequisites**: Docker and Docker Compose
+
+1. **Clone and setup**:
+```bash
+git clone <repository-url>
+cd NetDA
+```
+
+2. **Environment setup**:
+```bash
+cp docker.env.example .env
+# Edit .env with your API keys (see Environment Variables section)
+```
+
+3. **Run with Docker**:
+```bash
+# Build and start the application
+docker-compose up --build
+
+# Or run in background
+docker-compose up -d --build
+```
+
+4. **Initialize database**:
+```bash
+# Run database migrations and seed data
+docker-compose exec app npm run seed
+```
+
+**Access the application**:
+- Frontend: http://localhost:3001
+- Health Check: http://localhost:3001/api/health
+
+### Option 2: Local Development
+
+**Prerequisites**: Node.js 18+, npm, MetaMask browser extension
 
 1. **Clone and setup**:
 ```bash
@@ -177,11 +209,63 @@ npm run test:watch         # Watch mode
 - Virtualized lists for large transaction sets
 
 
+## Docker Commands
+
+### Basic Docker Usage
+
+```bash
+# Build and start the application
+docker-compose up --build
+
+# Run in background
+docker-compose up -d --build
+
+# Stop the application
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Execute commands in running container
+docker-compose exec app npm run seed
+docker-compose exec app npx prisma studio
+```
+
+### Docker Development
+
+```bash
+# Rebuild after code changes
+docker-compose up --build
+
+# Access container shell
+docker-compose exec app sh
+
+# View container status
+docker-compose ps
+
+# Clean up (remove containers and volumes)
+docker-compose down -v
+```
+
+### Production Deployment
+
+```bash
+# Set production environment variables
+export NODE_ENV=production
+export JWT_SECRET=your-secure-jwt-secret
+
+# Build and deploy
+docker-compose -f docker-compose.yml up -d --build
+
+# Check health
+curl http://localhost:3001/api/health
+```
+
 ## Deployment
 
 ```bash
-# Docker deployment
-docker-compose up -d
+# Docker deployment (recommended)
+docker-compose up -d --build
 
 # Manual deployment
 npm run build

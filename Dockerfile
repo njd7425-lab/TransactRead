@@ -1,6 +1,9 @@
 # Multi-stage build for production
 FROM node:18-alpine AS base
 
+# Install system dependencies
+RUN apk add --no-cache wget
+
 # Install dependencies only when needed
 FROM base AS deps
 WORKDIR /app
@@ -60,6 +63,10 @@ EXPOSE 3001
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/health || exit 1
 
 # Start the application
 CMD ["node", "server/index.js"]
