@@ -7,23 +7,21 @@ A lightweight web application for analyzing Ethereum wallet activity with AI-pow
 Blockchain transaction data is complex and difficult to interpret. Users need a simple way to:
 - Track multiple Ethereum wallets
 - Understand transaction patterns
-- Get AI-powered summaries of complex transactions
-- Monitor wallet activity over time
+- Get summaries of complex transactions
 
 ## Core Features
 
 - **Multi-wallet Management**: Add and track up to 10 Ethereum wallets per user
 - **Transaction Analysis**: Real-time sync with Etherscan API
 - **AI Summaries**: On-demand transaction explanations using Gemini AI
-- **Dual Authentication**: Firebase Auth + MetaMask wallet connection
-- **Responsive Design**: Mobile-first UI with TailwindCSS
+- **Dual Authentication**: Firebase Auth + MetaMask Auth
 
 ## Tech Stack
 
 **Frontend**: React + Vite, TailwindCSS, Context API
 **Backend**: Node.js + Express, Prisma ORM, SQLite
 **AI**: Google Gemini 2.0 Flash for transaction summaries
-**Auth**: Firebase Admin SDK + MetaMask signature verification
+**Auth**: Firebase Admin SDK + MetaMask 
 **APIs**: Etherscan API for blockchain data
 
 ## Quick Start
@@ -178,13 +176,6 @@ npm run test:watch         # Watch mode
 - Caching: 5-minute cache on transaction data
 - Virtualized lists for large transaction sets
 
-## Accessibility
-
-- WCAG 2.1 AA compliant
-- Keyboard navigation support
-- Screen reader friendly
-- High contrast mode support
-- Focus indicators on all interactive elements
 
 ## Deployment
 
