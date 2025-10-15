@@ -3,6 +3,7 @@ const router = express.Router();
 const prisma = require('../lib/prisma');
 const { authenticateToken } = require('../middleware/auth');
 
+// Use Firebase authentication
 router.use(authenticateToken);
 
 router.get('/', async (req, res) => {
@@ -27,20 +28,36 @@ router.post('/', async (req, res) => {
   try {
     const { address, label } = req.body;
     
-    const existingWallet = await prisma.wallet.findUnique({
-      where: { address }
+    console.log('Adding wallet:', { address, label, userId: req.user.uid });
+    
+    // Validate required fields
+    if (!address) {
+      return res.status(400).json({ error: 'Wallet address is required' });
+    }
+
+    // Validate Ethereum address format
+    const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+    if (!ethAddressRegex.test(address)) {
+      return res.status(400).json({ error: 'Invalid Ethereum address format' });
+    }
+    
+    const existingWallet = await prisma.wallet.findFirst({
+      where: { 
+        address,
+        userId: req.user.uid 
+      }
     });
 
     if (existingWallet) {
-      return res.status(400).json({ error: 'Wallet already exists' });
+      return res.status(400).json({ error: 'Wallet already exists for this user' });
     }
 
     const userWallets = await prisma.wallet.count({
       where: { userId: req.user.uid }
     });
 
-    if (userWallets >= 3) {
-      return res.status(400).json({ error: 'Maximum 3 wallets allowed' });
+    if (userWallets >= 10) {
+      return res.status(400).json({ error: 'Maximum 10 wallets allowed' });
     }
 
     const wallet = await prisma.wallet.create({
@@ -51,8 +68,10 @@ router.post('/', async (req, res) => {
       }
     });
 
+    console.log('Wallet created successfully:', wallet.id);
     res.status(201).json(wallet);
   } catch (error) {
+    console.error('Error creating wallet:', error);
     res.status(500).json({ error: 'Failed to create wallet' });
   }
 });

@@ -13,6 +13,8 @@ const Dashboard = () => {
   const [walletAddress, setWalletAddress] = useState('');
   const [walletLabel, setWalletLabel] = useState('');
   const [addingWallet, setAddingWallet] = useState(false);
+  const [addressError, setAddressError] = useState('');
+  const [labelError, setLabelError] = useState('');
 
   const navigate = useNavigate();
 
@@ -22,18 +24,44 @@ const Dashboard = () => {
 
   const { addWallet } = useWallet();
 
+  const validateEthereumAddress = (address) => {
+    // Basic Ethereum address validation
+    const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+    return ethAddressRegex.test(address);
+  };
+
   const handleAddWallet = async (e) => {
     e.preventDefault();
-    if (!walletAddress.trim()) return;
+    setAddressError('');
+    setLabelError('');
+
+    const trimmedAddress = walletAddress.trim();
+    const trimmedLabel = walletLabel.trim();
+    
+    if (!trimmedAddress) {
+      setAddressError('Wallet address is required');
+      return;
+    }
+
+    if (!validateEthereumAddress(trimmedAddress)) {
+      setAddressError('Please enter a valid Ethereum address (0x followed by 40 hexadecimal characters)');
+      return;
+    }
+
+    if (trimmedLabel && trimmedLabel.length > 50) {
+      setLabelError('Label must be 50 characters or less');
+      return;
+    }
 
     setAddingWallet(true);
     try {
-      await addWallet(walletAddress.trim(), walletLabel.trim() || undefined);
+      await addWallet(trimmedAddress, walletLabel.trim() || undefined);
       setWalletAddress('');
       setWalletLabel('');
       setShowAddWallet(false);
     } catch (error) {
       console.error('Error adding wallet:', error);
+      setAddressError(error.response?.data?.error || 'Failed to add wallet');
     } finally {
       setAddingWallet(false);
     }
@@ -42,6 +70,14 @@ const Dashboard = () => {
   const handleLogout = async () => {
     await logout();
     navigate('/login');
+  };
+
+  const closeAddWalletModal = () => {
+    setShowAddWallet(false);
+    setWalletAddress('');
+    setWalletLabel('');
+    setAddressError('');
+    setLabelError('');
   };
 
   if (loading) {
@@ -127,11 +163,17 @@ const Dashboard = () => {
                     <input
                       type="text"
                       value={walletAddress}
-                      onChange={(e) => setWalletAddress(e.target.value)}
-                      className="input mt-1"
+                      onChange={(e) => {
+                        setWalletAddress(e.target.value);
+                        setAddressError(''); // Clear error when user types
+                      }}
+                      className={`input mt-1 ${addressError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                       placeholder="0x..."
                       required
                     />
+                    {addressError && (
+                      <p className="mt-1 text-sm text-red-600">{addressError}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -140,16 +182,23 @@ const Dashboard = () => {
                     <input
                       type="text"
                       value={walletLabel}
-                      onChange={(e) => setWalletLabel(e.target.value)}
-                      className="input mt-1"
+                      onChange={(e) => {
+                        setWalletLabel(e.target.value);
+                        setLabelError(''); // Clear error when user types
+                      }}
+                      className={`input mt-1 ${labelError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                       placeholder="My Main Wallet"
+                      maxLength={50}
                     />
+                    {labelError && (
+                      <p className="mt-1 text-sm text-red-600">{labelError}</p>
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-end space-x-3 mt-6">
                   <button
                     type="button"
-                    onClick={() => setShowAddWallet(false)}
+                    onClick={closeAddWalletModal}
                     className="btn-secondary"
                   >
                     Cancel

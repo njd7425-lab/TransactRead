@@ -34,7 +34,7 @@ const TransactionCard = ({ transaction }) => {
             {getCategoryIcon(transaction.category)}
             <div>
               <p className="font-medium text-gray-900">
-                {transaction.summary || `${transaction.category} Transaction`}
+                {transaction.category} Transaction
               </p>
               <p className="text-sm text-gray-500">
                 {formatDate(transaction.timestamp)}

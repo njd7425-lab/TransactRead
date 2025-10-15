@@ -7,13 +7,18 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
+// Add Firebase token interceptor
 apiClient.interceptors.request.use(async (config) => {
-  const auth = getAuth();
-  const user = auth.currentUser;
-  
-  if (user) {
-    const token = await user.getIdToken();
-    config.headers.Authorization = `Bearer ${token}`;
+  try {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    
+    if (user) {
+      const token = await user.getIdToken();
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    console.log('No Firebase auth available, proceeding without token');
   }
   
   return config;
@@ -42,6 +47,16 @@ export const api = {
 
   async syncTransactions(walletId) {
     const response = await apiClient.post(`/transactions/sync/${walletId}`);
+    return response.data;
+  },
+
+  async generateSummary(transactionId) {
+    const response = await apiClient.post(`/transactions/${transactionId}/generate-summary`);
+    return response.data;
+  },
+
+  async clearTransactions(walletId) {
+    const response = await apiClient.delete(`/transactions/wallet/${walletId}`);
     return response.data;
   },
 

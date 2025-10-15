@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, Clock, Zap, Hash } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Clock, Zap, Hash, Sparkles } from 'lucide-react';
 import { api } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -9,6 +9,7 @@ const TransactionDetail = () => {
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [generatingSummary, setGeneratingSummary] = useState(false);
 
   useEffect(() => {
     const fetchTransaction = async () => {
@@ -24,6 +25,22 @@ const TransactionDetail = () => {
 
     fetchTransaction();
   }, [id]);
+
+  const handleGenerateSummary = async () => {
+    setGeneratingSummary(true);
+    try {
+      const response = await api.generateSummary(id);
+      setTransaction(prev => ({
+        ...prev,
+        summary: response.summary
+      }));
+    } catch (error) {
+      console.error('Error generating summary:', error);
+      alert('Failed to generate summary. Please try again.');
+    } finally {
+      setGeneratingSummary(false);
+    }
+  };
 
   const formatValue = (value) => {
     const eth = Number(value) / Math.pow(10, 18);
@@ -108,8 +125,22 @@ const TransactionDetail = () => {
                 {transaction.category}
               </span>
             </div>
-            {transaction.summary && (
+            {transaction.summary ? (
               <p className="mt-2 text-gray-600">{transaction.summary}</p>
+            ) : (
+              <div className="mt-2">
+                <button
+                  onClick={handleGenerateSummary}
+                  disabled={generatingSummary}
+                  className="inline-flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Sparkles className={`h-4 w-4 ${generatingSummary ? 'animate-spin' : ''}`} />
+                  <span>{generatingSummary ? 'Generating...' : 'Generate AI Summary'}</span>
+                </button>
+                <p className="mt-1 text-sm text-gray-500">
+                  Get an AI-powered explanation of this transaction
+                </p>
+              </div>
             )}
           </div>
 

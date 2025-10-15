@@ -1,7 +1,7 @@
 const admin = require('firebase-admin');
 
 // Initialize Firebase Admin SDK only if credentials are available
-if (!admin.apps.length && process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY) {
+if (!admin.apps.length && process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_PRIVATE_KEY !== 'demo_private_key') {
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
@@ -12,9 +12,12 @@ if (!admin.apps.length && process.env.FIREBASE_PROJECT_ID && process.env.FIREBAS
 }
 
 const authenticateToken = async (req, res, next) => {
-  // For demo purposes, allow requests without proper Firebase setup
+  console.log('Auth middleware called, admin.apps.length:', admin.apps.length);
+  
+  // Check if Firebase is properly initialized
   if (!admin.apps.length) {
-    req.user = { uid: 'demo-user', email: 'demo@example.com' };
+    console.log('Firebase not initialized, using demo mode');
+    req.user = { uid: 'test-user-123', email: 'test@example.com' };
     return next();
   }
 
@@ -30,6 +33,7 @@ const authenticateToken = async (req, res, next) => {
     req.user = decodedToken;
     next();
   } catch (error) {
+    console.error('Token verification failed:', error.message);
     return res.status(403).json({ error: 'Invalid token' });
   }
 };

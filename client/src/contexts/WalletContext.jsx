@@ -61,6 +61,16 @@ export const WalletProvider = ({ children }) => {
     }
   };
 
+  const clearTransactions = async (walletId) => {
+    try {
+      await api.clearTransactions(walletId);
+      setTransactions([]);
+    } catch (error) {
+      console.error('Error clearing transactions:', error);
+      throw error;
+    }
+  };
+
   const value = {
     wallets,
     transactions,
@@ -68,7 +78,8 @@ export const WalletProvider = ({ children }) => {
     fetchWallets,
     addWallet,
     fetchTransactions,
-    syncTransactions
+    syncTransactions,
+    clearTransactions
   };
 
   return (

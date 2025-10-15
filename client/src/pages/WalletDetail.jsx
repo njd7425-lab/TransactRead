@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWallet } from '../contexts/WalletContext';
-import { ArrowLeft, RefreshCw, Search, Filter } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Search, Filter, Trash2 } from 'lucide-react';
 import TransactionCard from '../components/TransactionCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const WalletDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { transactions, loading, fetchTransactions, syncTransactions } = useWallet();
+  const { transactions, loading, fetchTransactions, syncTransactions, clearTransactions } = useWallet();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [syncing, setSyncing] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   useEffect(() => {
     fetchTransactions(id);
@@ -25,6 +26,20 @@ const WalletDetail = () => {
       console.error('Error syncing transactions:', error);
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const handleClear = async () => {
+    if (window.confirm('Are you sure you want to clear all transactions? This action cannot be undone.')) {
+      setClearing(true);
+      try {
+        await clearTransactions(id);
+      } catch (error) {
+        console.error('Error clearing transactions:', error);
+        alert('Failed to clear transactions. Please try again.');
+      } finally {
+        setClearing(false);
+      }
     }
   };
 
@@ -67,14 +82,24 @@ const WalletDetail = () => {
             <h2 className="text-2xl font-bold text-gray-900">Wallet Transactions</h2>
             <p className="text-gray-600">{transactions.length} transactions found</p>
           </div>
-          <button
-            onClick={handleSync}
-            disabled={syncing}
-            className="btn-primary flex items-center space-x-2 disabled:opacity-50"
-          >
-            <RefreshCw className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
-            <span>{syncing ? 'Syncing...' : 'Sync Transactions'}</span>
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={handleClear}
+              disabled={clearing || transactions.length === 0}
+              className="btn-secondary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Trash2 className={`h-4 w-4 ${clearing ? 'animate-pulse' : ''}`} />
+              <span>{clearing ? 'Clearing...' : 'Clear All'}</span>
+            </button>
+            <button
+              onClick={handleSync}
+              disabled={syncing}
+              className="btn-primary flex items-center space-x-2 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
+              <span>{syncing ? 'Syncing...' : 'Sync Transactions'}</span>
+            </button>
+          </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">

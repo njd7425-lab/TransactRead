@@ -1,16 +1,15 @@
 const axios = require('axios');
-const OpenAI = require('openai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const ETHERSCAN_API_URL = 'https://api.etherscan.io/api';
+const ETHERSCAN_API_URL = 'https://api.etherscan.io/v2/api';
 
 const fetchTransactionsFromEtherscan = async (address) => {
   try {
     const response = await axios.get(ETHERSCAN_API_URL, {
       params: {
+        chainid: '1', // Ethereum Mainnet
         module: 'account',
         action: 'txlist',
         address,
@@ -43,28 +42,17 @@ const fetchTransactionsFromEtherscan = async (address) => {
 
 const generateSummary = async (transaction) => {
   try {
-    const prompt = `Summarize this Ethereum transaction in plain English: ${JSON.stringify(transaction)}`;
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
     
-    const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a helpful assistant that explains Ethereum transactions simply.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      max_tokens: 100,
-      temperature: 0.7
-    });
-
-    return response.choices[0].message.content;
+    const prompt = `Provide a simple 1-2 line summary of this Ethereum transaction: ${JSON.stringify(transaction)}`;
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    
+    return response.text();
   } catch (error) {
     console.error('Error generating summary:', error);
-    return 'Summary unavailable — try again later.';
+    throw error; // Re-throw the error so it can be handled by the route
   }
 };
 
