@@ -180,6 +180,11 @@ POST /api/transactions/123/generate-summary
 
 **Safety**: No PII handling, rate-limited to 10 requests/minute per user, fallback to basic transaction display.
 
+## Prompt  
+
+Gemini Prompt: "Provide a simple 1-2 line summary of this Ethereum transaction: [transaction data]"  
+The application sends the entire transaction object as JSON to Gemini 2.0 Flash Experimental model, requesting a concise 1-2 line summary of the blockchain transaction. This approach keeps the prompt simple.
+
 ## Database Schema
 
 **Users**: Firebase UID, email, creation date  
