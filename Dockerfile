@@ -31,8 +31,18 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build client
+# Clean node_modules to avoid platform conflicts
+RUN rm -rf client/node_modules server/node_modules
+
+# Reinstall dependencies in the container
+WORKDIR /app
+RUN npm ci
+
+# Install client dependencies
 WORKDIR /app/client
+RUN npm ci
+
+# Build client
 RUN npm run build
 
 # Production image
@@ -47,9 +57,12 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/server ./server
 COPY --from=builder /app/client/dist ./client/dist
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/server/package*.json ./server/
 
 # Install production dependencies
+WORKDIR /app/server
 RUN npm ci --only=production && npm cache clean --force
+WORKDIR /app
 
 # Create necessary directories
 RUN mkdir -p /app/server/prisma && chown -R nextjs:nodejs /app
