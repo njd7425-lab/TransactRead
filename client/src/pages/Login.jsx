@@ -3,8 +3,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { useMetaMask } from '../contexts/MetaMaskContext';
 import { useNavigate } from 'react-router-dom';
 import { Wallet, Eye, EyeOff, ExternalLink } from 'lucide-react';
-import MetaMaskDebug from '../components/MetaMaskDebug';
-import MetaMaskTest from '../components/MetaMaskTest';
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -222,11 +220,6 @@ const Login = () => {
           </div>
         </form>
         
-        {/* Debug components - remove in production */}
-        <div className="mt-8 space-y-4">
-          <MetaMaskTest />
-          <MetaMaskDebug />
-        </div>
       </div>
     </div>
   );

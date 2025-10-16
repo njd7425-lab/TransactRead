@@ -98,7 +98,9 @@ const Dashboard = () => {
               <h1 className="ml-2 text-xl font-bold text-gray-900">TransactRead</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">{user?.email}</span>
+              <span className="text-sm text-gray-600">
+                {user?.address ? `${user.address.slice(0, 4)}...${user.address.slice(-4)}` : user?.email}
+              </span>
               <button
                 onClick={handleLogout}
                 className="flex items-center space-x-1 text-sm text-gray-600 hover:text-gray-900"
