@@ -38,6 +38,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [checkAuth, setCheckAuth] = useState(0);
 
   useEffect(() => {
     console.log('AuthContext useEffect - isFirebaseConfigured:', isFirebaseConfigured);
@@ -48,8 +49,11 @@ export const AuthProvider = ({ children }) => {
     
     if (authToken && userData) {
       console.log('Found MetaMask authentication token');
+      console.log('AuthToken:', authToken);
+      console.log('UserData:', userData);
       try {
         const user = JSON.parse(userData);
+        console.log('Parsed user:', user);
         setUser(user);
         setLoading(false);
         return;
@@ -84,7 +88,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [checkAuth]);
 
   const signUp = async (email, password) => {
     if (!isFirebaseConfigured) {
@@ -138,12 +142,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const refreshAuth = () => {
+    console.log('Refreshing authentication...');
+    setCheckAuth(prev => prev + 1);
+  };
+
   const value = {
     user,
     signUp,
     signIn,
     logout,
-    loading
+    loading,
+    refreshAuth
   };
 
   return (

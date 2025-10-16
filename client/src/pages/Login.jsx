@@ -13,7 +13,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
 
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, refreshAuth } = useAuth();
   const { authenticateWithMetaMask, isMetaMaskInstalled, isConnecting, error: metaMaskError } = useMetaMask();
   const navigate = useNavigate();
 
@@ -72,8 +72,13 @@ const Login = () => {
       const user = await authenticateWithMetaMask();
       console.log('MetaMask authentication result:', user);
       if (user) {
-        console.log('Authentication successful, navigating to dashboard...');
-        navigate('/');
+        console.log('Authentication successful, refreshing auth context...');
+        refreshAuth();
+        // Wait a moment for the auth context to update
+        setTimeout(() => {
+          console.log('Navigating to dashboard...');
+          navigate('/');
+        }, 100);
       } else {
         console.log('Authentication failed - no user returned');
         setError('Authentication failed. Please try again.');

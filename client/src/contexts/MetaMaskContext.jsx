@@ -143,7 +143,11 @@ export const MetaMaskProvider = ({ children }) => {
         // Store the authentication token
         localStorage.setItem('authToken', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
-        console.log('Authentication successful');
+        console.log('Authentication successful, user data:', response.data.user);
+        console.log('Stored in localStorage:', {
+          token: response.data.token,
+          user: response.data.user
+        });
         return response.data.user;
       }
 
