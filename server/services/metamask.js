@@ -47,16 +47,20 @@ const validateAuthRequest = (address, message, signature, timestamp) => {
     };
   }
 
-  // Validate Ethereum address format
-  if (!ethers.isAddress(address)) {
+  // Validate Ethereum address format using regex (more lenient than ethers.getAddress)
+  const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+  if (!ethAddressRegex.test(address)) {
     return {
       valid: false,
       error: 'Invalid Ethereum address format'
     };
   }
-
-  // Check if the message matches the expected format
+  
+  // Check if the message matches the expected format (use original address for message)
   const expectedMessage = generateAuthMessage(address, timestamp);
+  
+  // Normalize the address to lowercase for consistency (after message check)
+  address = address.toLowerCase();
   if (message !== expectedMessage) {
     return {
       valid: false,
