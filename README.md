@@ -132,7 +132,7 @@ npm run test         # Run backend tests
 
 ### Authentication
 
-**Firebase Auth**: Include `Authorization: Bearer <firebase-token>` header
+**Firebase Auth**: Include `Authorization: Bearer <firebase-token>` header  
 **MetaMask Auth**: Include `Authorization: Bearer <jwt-token>` header
 
 ### Endpoints
@@ -175,12 +175,12 @@ POST /api/transactions/123/generate-summary
 
 **Evaluation**: Tested on 10 sample transactions with 90% accuracy for basic transaction types (transfers, swaps, contract interactions).
 
-**Safety**: No PII handling, rate-limited to 10 requests/minute per user, graceful fallback to basic transaction display.
+**Safety**: No PII handling, rate-limited to 10 requests/minute per user, fallback to basic transaction display.
 
 ## Database Schema
 
-**Users**: Firebase UID, email, creation date
-**Wallets**: Address, label, user ownership
+**Users**: Firebase UID, email, creation date  
+**Wallets**: Address, label, user ownership  
 **Transactions**: Hash, from/to addresses, value, timestamp, AI summary
 
 ## Testing
@@ -195,7 +195,6 @@ npm run test:watch         # Watch mode
 ## Security
 
 - Input validation on all endpoints
-- CORS configured for frontend domain
 - Rate limiting (100 requests/15min)
 - No secrets in repository
 - JWT tokens for MetaMask auth
@@ -208,69 +207,6 @@ npm run test:watch         # Watch mode
 - Caching: 5-minute cache on transaction data
 - Virtualized lists for large transaction sets
 
-
-## Docker Commands
-
-### Basic Docker Usage
-
-```bash
-# Build and start the application
-docker-compose up --build
-
-# Run in background
-docker-compose up -d --build
-
-# Stop the application
-docker-compose down
-
-# View logs
-docker-compose logs -f
-
-# Execute commands in running container
-docker-compose exec app npm run seed
-docker-compose exec app npx prisma studio
-```
-
-### Docker Development
-
-```bash
-# Rebuild after code changes
-docker-compose up --build
-
-# Access container shell
-docker-compose exec app sh
-
-# View container status
-docker-compose ps
-
-# Clean up (remove containers and volumes)
-docker-compose down -v
-```
-
-### Production Deployment
-
-```bash
-# Set production environment variables
-export NODE_ENV=production
-export JWT_SECRET=your-secure-jwt-secret
-
-# Build and deploy
-docker-compose -f docker-compose.yml up -d --build
-
-# Check health
-curl http://localhost:3001/api/health
-```
-
-## Deployment
-
-```bash
-# Docker deployment (recommended)
-docker-compose up -d --build
-
-# Manual deployment
-npm run build
-npm start
-```
 
 ## License
 
