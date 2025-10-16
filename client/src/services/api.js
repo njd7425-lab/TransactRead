@@ -7,9 +7,17 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Add Firebase token interceptor
+// Add authentication token interceptor
 apiClient.interceptors.request.use(async (config) => {
   try {
+    // First check for MetaMask authentication token
+    const metaMaskToken = localStorage.getItem('authToken');
+    if (metaMaskToken) {
+      config.headers.Authorization = `Bearer ${metaMaskToken}`;
+      return config;
+    }
+    
+    // If no MetaMask token, try Firebase
     const auth = getAuth();
     const user = auth.currentUser;
     
@@ -18,7 +26,7 @@ apiClient.interceptors.request.use(async (config) => {
       config.headers.Authorization = `Bearer ${token}`;
     }
   } catch (error) {
-    console.log('No Firebase auth available, proceeding without token');
+    console.log('No authentication available, proceeding without token');
   }
   
   return config;

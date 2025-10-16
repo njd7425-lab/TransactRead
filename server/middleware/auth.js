@@ -25,7 +25,11 @@ const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
+  console.log('Auth header:', authHeader ? 'Present' : 'Missing');
+  console.log('Token:', token ? 'Present' : 'Missing');
+
   if (!token) {
+    console.log('No token provided');
     return res.status(401).json({ error: 'Access token required' });
   }
 
@@ -40,7 +44,9 @@ const authenticateToken = async (req, res, next) => {
       
       // If Firebase fails, try JWT verification (for MetaMask users)
       try {
+        console.log('Trying JWT verification...');
         const decodedJwt = jwt.verify(token, process.env.JWT_SECRET);
+        console.log('JWT decoded successfully:', { uid: decodedJwt.uid, authMethod: decodedJwt.authMethod });
         
         // Check if this is a MetaMask authentication
         if (decodedJwt.authMethod === 'metamask') {
@@ -49,6 +55,7 @@ const authenticateToken = async (req, res, next) => {
             email: decodedJwt.email,
             authMethod: 'metamask'
           };
+          console.log('MetaMask authentication successful');
           return next();
         }
         

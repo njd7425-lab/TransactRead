@@ -41,15 +41,25 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Invalid Ethereum address format' });
     }
     
-    const existingWallet = await prisma.wallet.findFirst({
+    // Check if wallet exists for this user
+    const existingWalletForUser = await prisma.wallet.findFirst({
       where: { 
         address,
         userId: req.user.uid 
       }
     });
 
-    if (existingWallet) {
+    if (existingWalletForUser) {
       return res.status(400).json({ error: 'Wallet already exists for this user' });
+    }
+
+    // Check if wallet exists for any user (global unique constraint)
+    const existingWalletGlobal = await prisma.wallet.findFirst({
+      where: { address }
+    });
+
+    if (existingWalletGlobal) {
+      return res.status(400).json({ error: 'Wallet address already exists in the system' });
     }
 
     const userWallets = await prisma.wallet.count({
@@ -72,6 +82,16 @@ router.post('/', async (req, res) => {
     res.status(201).json(wallet);
   } catch (error) {
     console.error('Error creating wallet:', error);
+    
+    // Handle specific Prisma errors
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'Wallet address already exists' });
+    }
+    
+    if (error.code === 'P2003') {
+      return res.status(400).json({ error: 'User not found' });
+    }
+    
     res.status(500).json({ error: 'Failed to create wallet' });
   }
 });
