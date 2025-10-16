@@ -24,6 +24,9 @@ Blockchain transaction data is complex and difficult to interpret. Users need a 
 **Auth**: Firebase Admin SDK + MetaMask  
 **APIs**: Etherscan API for blockchain data  
 
+## Demo
+[![Watch the video](https://i.imgur.com/Xshl4hp.mp4)](https://i.imgur.com/Xshl4hp.mp4)
+
 ## Quick Start
 
 ### Option 1: Docker (Recommended)
@@ -205,8 +208,6 @@ npm run test:watch         # Watch mode
 - CRUD operations: <200ms p95
 - AI summaries: <3s p95
 - Caching: 5-minute cache on transaction data
-- Virtualized lists for large transaction sets
-
 
 ## License
 
